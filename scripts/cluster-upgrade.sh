@@ -38,6 +38,8 @@ log() {
     NAME=$1
     STAGE=$2
     MESSAGE=$3
+
+    MESSAGE=$(echo $MESSAGE | sed 's/\(.*\),$/\1/g')
     
     echo "$(date "+%Y-%m-%d_%H.%M.%S") - $NAME - $STAGE - $MESSAGE"
 }
