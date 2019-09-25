@@ -163,7 +163,7 @@ upgrade() {
         then
             OUTPUT="$OUTPUT,\"API=OK\""
         else
-            log $OCM_NAME "upgrade" "ERROR: API requests are failing, msg = $API_RESPONSE"
+            log $OCM_NAME "upgrade" "INFO: API requests are failing, msg = $API_RESPONSE"
             # don't bother with other checks, there is a good chance they won't work
             continue
         fi
@@ -172,14 +172,14 @@ upgrade() {
         
         if [ "$DCO" != "" ];
         then
-            log $OCM_NAME "upgrade" "ERROR: Degraded Operators = $DCO"
+            log $OCM_NAME "upgrade" "INFO: Degraded Operators = $DCO"
         fi
 
         CA=$(curl -G -s -k -H "Authorization: Bearer $(KUBECONFIG=$TMP_DIR/kubeconfig-${CD_NAMESPACE} oc -n openshift-monitoring sa get-token prometheus-k8s)" --data-urlencode "query=ALERTS{alertstate!=\"pending\",severity=\"critical\"}" "https://$(KUBECONFIG=$TMP_DIR/kubeconfig-${CD_NAMESPACE} oc -n openshift-monitoring get routes prometheus-k8s -o json | jq -r .spec.host)/api/v1/query" | jq -r '.data.result[].metric.alertname' | tr '\n' ',' )
 
         if [ "$CA" != "" ];
         then
-            log $OCM_NAME "upgrade" "ERROR: Critical Alerts = $CA"
+            log $OCM_NAME "upgrade" "WARNING: Critical Alerts = $CA"
         fi
 
         POD_ISSUES=$(KUBECONFIG=$TMP_DIR/kubeconfig-${CD_NAMESPACE} oc get pods --all-namespaces --no-headers | grep -v -e Running -e Completed -e Terminating -e ContainerCreating -e Init -e Pending | grep -e ^default -e ^kube -e ^openshift)
@@ -187,7 +187,7 @@ upgrade() {
         
         if [ "$PPC" != "0" ];
         then
-            log $OCM_NAME "upgrade" "ERROR: Problem Pod Count = $PPC
+            log $OCM_NAME "upgrade" "INFO: Problem Pod Count = $PPC
 $POD_ISSUES"
         fi
     done
