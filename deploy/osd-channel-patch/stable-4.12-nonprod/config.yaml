@@ -8,6 +8,6 @@ selectorSyncSet:
     operator: NotIn
     values: ["nightly","candidate","fast"]
   - key: api.openshift.com/environment
-    operator: In
+    operator: NotIn
     values:
       - "production"
